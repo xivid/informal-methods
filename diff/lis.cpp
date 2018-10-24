@@ -23,9 +23,6 @@
 #include <vector>
 #include <algorithm>
 
-#define max(a, b) ((a) > (b) ? (a) : (b))
-#define min(a, b) ((a) < (b) ? (a) : (b))
-
 // temporary
 size_t binary_search(const std::vector<int>& M,
                            size_t low,
@@ -51,57 +48,63 @@ void get_input(std::vector<int>& A,
         A.push_back(x);
     }
     N = A.size();
-    A.resize(N+1);  // for holding A[N]
+    A.resize(N+1);  // avoids out-of-bound error when n == N-1
     M.resize(N+1);
 }
 
+/** Invariants
+ * 
+ * Invariant `UpSequence': 
+ *   the variable m is the maximum length of the upsequences in A[0, n) 
+ *   (i.e. ending before A[n]).
+ * Invariant `Prefix': 
+ *   the variable l is the length of the longest prefix of A[n] 
+ *   (i.e. some upsequence ending exactly at A[i] where 0 <= i < n and 
+ *   A[i] < A[n]).
+ * Invariant `MinimalEndpoint':
+ *   for all k s.t. 0 <= k <= m, M[k] is the minimum A[i] in 0 <= i <= n
+ *   that has a longest prefix of length k.
+ * Invariant `MSorted':
+ *   M is sorted, i.e. if i < j then M[i] < M[j].
+ *   (cannot be M[i] == M[j], otherwise contradict with `MinimalEndpoint')
+ *
+ */
 int main() 
 {
     std::vector<int> A;  // input sequence
     size_t N;  // length of A
     size_t n;  // loop variable
-    size_t m;  // TBA
-    size_t l;  // TBA
-    std::vector<int> M;  // TBA auxiliary array
+    size_t m;  // length of longest upsequence seen so far (i.e. in A[0, n))
+    size_t l;  // length of longest prefix of A[n]
+    std::vector<int> M;  // M[k] is the minimal A[i] seen so far 
+                         // whose longest prefix's length is k
     get_input(A, N, M);
 
     // Assign A[N] with "something", I choose INT_MAX so that it will not have
     // a chance to change M in the statement M[l] = min(M[l], A[n + 1]) of the
     // last round.
-    A[N] = INT_MAX;
+    A[N] = INT_MAX;  // The assumption is that all inputs < INT_MAX (2^31 - 1)
     n = m = l = 0;
-    // Invariant `UpSequence': 
-    //   the variable m is the maximum length of the upsequences in A[0, n) 
-    //   (i.e. ending before A[n]).
-    // Invariant `Prefix': 
-    //   the variable l is the length of the longest prefix of A[n] 
-    //   (i.e. some upsequence ending exactly at A[i] where 0 <= i < n and 
-    //   A[i] < A[n]).
 
     // `UpSequence' is true here, because n == 0, and the length of an empty set
     // is 0.
     // `Prefix' is true here, because the prefix of A[0] is empty.
-    M[0] = A[0];  // why 0? why isn't it INT_MAX? counterexample: -100 -98 -99
+    M[0] = A[0]; 
     for (size_t i = 1; i < N; ++i)
     {
         M[i] = INT_MAX;
     }
-    // Invariant `MinimalEndpoint':
-    //   for all k s.t. 0 <= k <= m, M[k] is the minimum A[i] in 0 <= i <= n
-    //   that has a longest prefix of length k.
-    // Invariant `MSorted':
-    //   M is sorted, i.e. if i < j then M[i] < M[j] (cannot be M[i] == M[j])
 
     // `MinimalEndpoint' is true here as m == n == 0, and M[0] == A[0].
     // `MSorted' is true here, obviously by the above assignments.
     while (n != N) {
         // `UpSequence', `Prefix', `MinimalEndpoint' 
         // and `MSorted' are all true here, as nothing as changed.
-        m = max(m, l + 1);
+        m = std::max(m, l + 1);
         // `UpSequence' is true up to n+1 here.
         l = binary_search(M, 0, m + 1, A[n + 1]);
         // M[0, l) < A[n+1] <= M[l, m+1), so `Prefix' is true up to n+1 here.
-        M[l] = min(M[l], A[n + 1]);
+        M[l] = std::min(M[l], A[n + 1]);
         // `MinimalEndpoint' is true up to n+1 here.
         // `MSorted' is true here.
         n = n + 1;
