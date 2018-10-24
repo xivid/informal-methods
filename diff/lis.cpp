@@ -55,17 +55,19 @@ void get_input(std::vector<int>& A,
 /** Invariants
  * 
  * Invariant `UpSequence': 
- *   the variable m is the maximum length of the upsequences in A[0, n) 
+ *   The variable m is the maximum length of the upsequences in A[0, n) 
  *   (i.e. ending before A[n]).
  * Invariant `Prefix': 
- *   the variable l is the length of the longest prefix of A[n] 
- *   (i.e. some upsequence ending exactly at A[i] where 0 <= i < n and 
+ *   The variable l is the length of the longest prefix of A[n].
+ *   (i.e. longest upsequence ending exactly at A[i] where 0 <= i < n and 
  *   A[i] < A[n]).
+ *   In other words, l is the smallest k satisfying M[k] >= A[n], thus it 
+ *   gives a length-((l-1)+1) prefix ending with M[l-1] for A[n].
  * Invariant `MinimalEndpoint':
- *   for all k s.t. 0 <= k <= m, M[k] is the minimum A[i] in 0 <= i <= n
+ *   For all k s.t. 0 <= k <= m, M[k] is the minimum A[i] in 0 <= i <= n
  *   that has a longest prefix of length k.
  * Invariant `MSorted':
- *   M is sorted, i.e. if i < j then M[i] < M[j].
+ *   M is sorted, i.e. for all 0 <= i < j <= m, it holds that M[i] < M[j].
  *   (cannot be M[i] == M[j], otherwise contradict with `MinimalEndpoint')
  *
  */
@@ -94,23 +96,32 @@ int main()
     {
         M[i] = INT_MAX;
     }
-
     // `MinimalEndpoint' is true here as m == n == 0, and M[0] == A[0].
     // `MSorted' is true here, obviously by the above assignments.
+    // `UpSequence' and `Prefix' are still true here as none of m, n, l changed.
+
     while (n != N) {
         // `UpSequence', `Prefix', `MinimalEndpoint' 
         // and `MSorted' are all true here, as nothing as changed.
+
         m = std::max(m, l + 1);
         // `UpSequence' is true up to n+1 here.
+
         l = binary_search(M, 0, m + 1, A[n + 1]);
-        // M[0, l) < A[n+1] <= M[l, m+1), so `Prefix' is true up to n+1 here.
+        // M[0, l) < A[n+1] <= M[l, m+1), so the longest prefix of A[n+1] is
+        // the length-(l-1) prefix of M[l-1] appended by M[l-1] itself, thus
+        // its length is (l-1)+1 = l.
+        // `Prefix' is true up to n+1 here.
+
         M[l] = std::min(M[l], A[n + 1]);
         // `MinimalEndpoint' is true up to n+1 here.
-        // `MSorted' is true here.
+        // `MSorted' is true up to n+1 here.
+
         n = n + 1;
         // `UpSequence', `Prefix', `MinimalEndpoint' 
         // and `MSorted' are all true up to n.
     }
+    // `UpSequence' is true here.
 
     printf("%lu\n", m);
     return 0;
