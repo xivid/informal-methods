@@ -12,8 +12,8 @@
  *  [Output]
  *  3
  *  [Explanation]
- *  The longest upsequences are [1, 3, 4] and [1, 2, 4], of which the length 
- *  is 3.
+ *  The longest upsequences are [1, 3, 4], [1, 2, 4] and [1, 2, 3], 
+ *  of which the length is 3.
  */
 
 #include <cstdio>
@@ -121,8 +121,11 @@ int main()
         // `UpSequence', `Prefix', `MinimalEndpoint' 
         // and `MSorted' are all true up to n.
     }
-    // `UpSequence' is true here.
+    // `UpSequence', `Prefix', `MinimalEndpoint' and `MSorted' 
+    // are all true up to N.
 
+    // output longest length
     printf("%lu\n", m);
+    
     return 0;
 }
