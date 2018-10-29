@@ -1,0 +1,17 @@
+Legi: 17-941-998
+
+Assignment 1
+
+The seven files asked for in the assignment sheet are (in the same order):
+
+1. lis.cpp
+2. lis.cpp.pdf
+3. lis_output_sequence.cpp
+4. lis_output_sequence.cpp.pdf
+5. examples_correspondences.pdf
+6. lcss.sh
+7. sample_runs.pdf
+
+All other files are test files, used in the described examples.
+
+To run the shell script, the C++ program should be compiled as "a.out" in the same folder.

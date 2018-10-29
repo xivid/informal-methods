@@ -1,0 +1,9 @@
+that
+file
+contains
+a
+statement
+removed
+from
+this
+context

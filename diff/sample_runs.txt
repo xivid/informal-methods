@@ -1,0 +1,202 @@
+Legi: 17-941-998
+
+Example 1:
+Input files are file1.txt and file2.txt in this folder.
+
+~/informal-methods/diff$ ./lcss.sh file1.txt file2.txt 
+Comparing file1.txt and file2.txt
+file1.txt:
+     1	10
+     5	21
+     2	22
+     4	33
+     7	41
+     6	50
+     8	60
+     9	80
+     3	9
+file2.txt:
+     1	10
+     3	23
+     6	41
+     4	50
+     5	60
+     7	61
+     2	9
+Correspondences:
+1 1
+7 6
+6 4
+8 5
+3 2
+Sorted:
+1 1
+3 2
+6 4
+7 6
+8 5
+Line number of longest common subsequences in file2.txt:
+1
+2
+4
+5
+Actual lines:
+10
+9
+50
+60
+
+
+Example 2:
+Input files are c1.txt and c2.txt in this folder.
+
+./lcss.sh c1.txt c2.txt 
+Comparing c1.txt and c2.txt
+c1.txt:
+     1	a
+     2	b
+     3	c
+     8	c
+     4	d
+     6	d
+     5	e
+     7	e
+c2.txt:
+     6	a
+     5	b
+     1	c
+     4	d
+     2	e
+     3	e
+Correspondences:
+1 6
+2 5
+3 1
+8 1
+4 4
+6 4
+5 2
+5 3
+7 2
+7 3
+Sorted:
+1 6
+2 5
+3 1
+4 4
+5 3
+5 2
+6 4
+7 3
+7 2
+8 1
+Line number of longest common subsequences in c2.txt:
+1
+2
+3
+Actual lines:
+c
+e
+e
+
+
+Example 3:
+Input files are this.txt and that.txt in this folder.
+
+~/informal-methods/diff$ ./lcss.sh this.txt that.txt 
+Comparing this.txt and that.txt
+this.txt:
+     4	be
+     8	context
+     6	from
+     7	its
+     3	mustn't
+     5	removed
+     2	statement
+     1	this
+that.txt:
+     4	a
+     3	contains
+     9	context
+     2	file
+     7	from
+     6	removed
+     5	statement
+     1	that
+     8	this
+Correspondences:
+8 9
+6 7
+5 6
+2 5
+1 8
+Sorted:
+1 8
+2 5
+5 6
+6 7
+8 9
+Line number of longest common subsequences in that.txt:
+5
+6
+7
+9
+Actual lines:
+statement
+removed
+from
+context
+
+Example 4:
+Input files are long1.txt and long2.txt
+
+./lcss.sh long1.txt long2.txt
+Comparing long1.txt and long2.txt
+long1.txt:
+     4	be
+     8	context
+     6	from
+     3	must
+     5	removed
+     2	statement
+     7	this false
+     1	this true
+long2.txt:
+     4	a
+     3	contains
+     9	context
+     2	file
+     7	from
+     6	removed
+     5	statement
+     1	that
+     8	this
+Correspondences:
+8 9
+6 7
+5 6
+2 5
+7 8
+1 8
+Real Correspondences:
+8 9
+6 7
+5 6
+2 5
+Sorted:
+2 5
+5 6
+6 7
+8 9
+Line number of longest common subsequences in long2.txt:
+5
+6
+7
+9
+Actual lines:
+statement
+removed
+from
+context
+
+
