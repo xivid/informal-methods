@@ -83,17 +83,17 @@ push(struct stream *S, struct buffer *B, struct thread_data *td) {
     CHECK(&S->push_step, td);
 
     STEP_START(&S->push_step, td);
+    S->I.x = S->I.x + 1;                                            // 11
+    STEP_END(&S->push_step, td);
+    CHECK(&S->push_step, td);
+
+    STEP_START(&S->push_step, td);
     S->I.T = false;                                                 // 9
     STEP_END(&S->push_step, td);
     CHECK(&S->push_step, td);
 
     STEP_START(&S->push_step, td);
     B->t_valid = B->t_valid + 1;                                    // 10
-    STEP_END(&S->push_step, td);
-    CHECK(&S->push_step, td);
-
-    STEP_START(&S->push_step, td);
-    S->I.x = S->I.x + 1;                                            // 11
     STEP_END(&S->push_step, td);
     CHECK(&S->push_step, td);
 }
@@ -149,11 +149,6 @@ pop(struct stream *S, struct buffer *B, struct thread_data *td) {
     STEP_END(&S->pop_step, td);
     CHECK(&S->pop_step, td);
 
-    // STEP_START(&S->pop_step, td);
-    // S->O.h = S->O.h + 1;
-    // STEP_END(&S->pop_step, td);
-    // CHECK(&S->pop_step, td);
-
     STEP_START(&S->pop_step, td);
     S->O.H = false;
     STEP_END(&S->pop_step, td);
@@ -163,7 +158,7 @@ pop(struct stream *S, struct buffer *B, struct thread_data *td) {
     B->h[S->colour] = B->h[S->colour] + 1;
     STEP_END(&S->pop_step, td);
     CHECK(&S->pop_step, td);
-
+    
     STEP_START(&S->pop_step, td);
     S->O.y = S->O.y + 1;
     STEP_END(&S->pop_step, td);

@@ -36,8 +36,6 @@ length_S_IB(struct stream *S, struct buffer *B) {
 uint64_t
 element_S_IB(struct stream *S, struct buffer *B, size_t i) {
     /* XXX */
-    assert(i < length_S_IB(S, B));
-
     size_t n = 0;
     bool found = false;
     uint64_t ret = 0;
@@ -65,8 +63,6 @@ length_S_B(struct stream *S, struct buffer *B) {
 uint64_t
 element_S_B(struct stream *S, struct buffer *B, size_t i) {
     /* XXX */
-    assert(i < length_S_B(S, B));
-
     size_t n = 0;
     bool found = false;
     uint64_t ret = 0;
