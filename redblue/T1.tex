@@ -1,0 +1,230 @@
+\documentclass[a4paper, 11pt]{article}
+\usepackage{comment} % enables the use of multi-line comments (\ifx \fi) 
+\usepackage{lipsum} %This package just generates Lorem Ipsum filler text. 
+\usepackage{fullpage} % changes the margin
+\usepackage{amsmath}
+
+\begin{document}
+
+\noindent
+\large\textbf{Task 1} \hfill \textbf{17-941-998}
+
+\section*{Third Procedure: \texttt{transfer()}}
+
+Denote the length, head and tail pointers of the two buffers with \texttt{NB1,h1,t1,NB2,h1,t2}, respectively. The variables in \texttt{push()} and \texttt{pop()} also need replacing accordingly.
+
+\begin{verbatim}
+push():
+  wait until t1 - h1 < NB1
+  B1[t1 mod NB1] := I[x]
+  x := x + 1
+  t1 := t1 + 1
+
+transfer():
+  wait until h1 < t1 and t2 - h2 < NB2
+  B2[t2 mod NB2] := B1[h1 mod NB1]
+  h1 := h1 + 1
+  t2 := t2 + 1
+
+pop():
+  wait until h2 < t2
+  O[y]:= B2[h2 mod NB2]
+  h2 := h2 + 1
+  y := y + 1
+\end{verbatim}
+
+\section*{Interpretations}
+To write an invariant of the form:
+$$ S_O+S_{B_2O}+S_{B_2}+S_{B_1B_2}+S_{B_1}+S_{IB_1}+S_I = K, $$
+the following interpretations are needed:
+\begin{flalign*}
+\qquad\qquad\qquad\qquad S_I &= I[x,N)
+&S_{IB_1} &= B_1[t_1\ \text{upto}\ x) \qquad\qquad\qquad\qquad\\
+S_{B_1} &= B_1[h_1\ \text{upto}\ t_1)
+&S_{B_1B_2} &= B_2[t_2\ \text{upto}\ h_1) \\
+S_{B_2} &= B_2[h_2\ \text{upto}\ t_2) 
+&S_{B_2O} &= O[y\ \text{upto}\ h_2) \\
+S_O &= O[0,y]
+\end{flalign*}
+
+\section*{Invariant}
+
+The updated invariant is 
+$$ S_O+S_{B_2O}+S_{B_2}+S_{B_1B_2}+S_{B_1}+S_{IB_1}+S_I = K $$
+with side conditions
+$$ h_1 \leq t_1 \land t_1-h_1 \leq N_{B_1} \land h_2 \leq t_2 \land t_2-h_2 \leq N_{B_2}. $$
+
+\subsection*{Local Correctness}
+
+\noindent For \texttt{push()}, a local invariant $S: x \leq N$ is added, $t_1=x \land x<N$ are preconditions, and $t_1=x$ is a postcondition:
+\begin{flalign*}
+& \triangleright S_O+S_{B_2O}+S_{B_2}+S_{B_1B_2}+S_{B_1}+S_{IB_1}+S_I=K \land x<N \land & \\ 
+& \quad h_1 \leq t_1 \land t_1-h_1 \leq N_{B_1} \land h_2 \leq t_2 \land t_2-h_2 \leq N_{B_2}  &\\
+& \triangleright t_1=x &\\
+% 1
+& \textbf{wait until } t_1-h_1<N_{B_1} & \\
+% 
+& \triangleright S_O+S_{B_2O}+S_{B_2}+S_{B_1B_2}+B_1[h_1\ \text{upto}\ t_1)+[\ ]+(I[x]+I[x+1, N))=K \land x<N \land & \\ 
+& \quad h_1 \leq t_1 \land t_1-h_1 < N_{B_1} \land h_2 \leq t_2 \land t_2-h_2 \leq N_{B_2}  &\\
+& \triangleright t_1=x &\\
+% 2
+& \mathbf{B_1}[t_1\ \text{mod} \ N_{B_1}] := I[x] & \\
+%
+& \triangleright S_O+S_{B_2O}+S_{B_2}+S_{B_1B_2}+B_1[h_1\ \text{upto}\ t_1)+[\ ]+(B_1[t_1\ \text{mod} \ N_{B_1}]+I[x+1, N))=K \land  & \\ 
+& \quad x<N \land h_1 \leq t_1 \land t_1-h_1 < N_{B_1} \land h_2 \leq t_2 \land t_2-h_2 \leq N_{B_2}  &\\
+& \triangleright t_1=x &\\
+% 3
+& \mathbf{x} := x + 1 & \\
+%
+& \triangleright S_O+S_{B_2O}+S_{B_2}+S_{B_1B_2}+B_1[h_1\ \text{upto}\ t_1)+B_1[t_1\ \text{mod} \ N_{B_1}]+I[x, N)=K \land x \leq N \land & \\ 
+& \quad h_1 \leq t_1 \land t_1-h_1 < N_{B_1} \land h_2 \leq t_2 \land t_2-h_2 \leq N_{B_2}  &\\
+& \triangleright t_1+1=x &\\
+% 4
+& \mathbf{t_1} := t_1 + 1 & \\
+%
+& \triangleright S_O+S_{B_2O}+S_{B_2}+S_{B_1B_2}+B_1[h_1\ \text{upto}\ t_1)+[\ ]+I[x, N)=K \land x \leq N \land & \\ 
+& \quad h_1 \leq t_1 \land t_1-h_1 \leq N_{B_1} \land h_2 \leq t_2 \land t_2-h_2 \leq N_{B_2}  &\\
+& \triangleright t_1=x &
+% 5
+\end{flalign*}
+
+\noindent For \texttt{pop()}, a local invariant $R: y \leq N$ is added, $y=h_2 \land y<N$ are preconditions, and $y=h_2$ is a postcondition:
+\begin{flalign*}
+& \triangleright S_O+S_{B_2O}+S_{B_2}+S_{B_1B_2}+S_{B_1}+S_{IB_1}+S_I=K \land y<N \land & \\ 
+& \quad h_1 \leq t_1 \land t_1-h_1 \leq N_{B_1} \land h_2 \leq t_2 \land t_2-h_2 \leq N_{B_2}  &\\
+& \triangleright y=h_2 &\\
+% 1
+& \textbf{wait until } h_2<t_2 & \\
+% 
+& \triangleright O[0,y)+[\ ]+(B_2[h_2\ \text{mod}\ N_{B_2}]+B_2[h_2+1\ \text{upto}\ t_2)) +S_{B_1B_2}+S_{B_1}+S_{IB_1}+S_I =K \land & \\ 
+& \quad y<N \land h_1 \leq t_1 \land t_1-h_1 \leq N_{B_1} \land h_2 < t_2 \land t_2-h_2 \leq N_{B_2}  &\\
+& \triangleright y=h_2 &\\
+% 2
+& \mathbf{O}[y] := B_2[h_2\ \text{mod}\ N_{B_2}] & \\
+%
+& \triangleright O[0,y)+[\ ]+(O[y]+B_2[h_2+1\ \text{upto}\ t_2)) +S_{B_1B_2}+S_{B_1}+S_{IB_1}+S_I =K \land y<N \land  & \\ 
+& \quad h_1 \leq t_1 \land t_1-h_1 \leq N_{B_1} \land h_2 < t_2 \land t_2-h_2 \leq N_{B_2}  &\\
+& \triangleright y=h_2 &\\
+% 3
+& \mathbf{h_2} := h_2 + 1 & \\
+%
+& \triangleright O[0,y)+O[y]+B_2[h_2\ \text{upto}\ t_2) +S_{B_1B_2}+S_{B_1}+S_{IB_1}+S_I =K \land y < N \land & \\ 
+& \quad h_1 \leq t_1 \land t_1-h_1 \leq N_{B_1} \land h_2 \leq t_2 \land t_2-h_2 \leq N_{B_2}  &\\
+& \triangleright y+1=h_2 &
+% 4
+\end{flalign*}
+\begin{flalign*}
+& \mathbf{y} := y + 1 & \\
+%
+& \triangleright O[0,y)+[\ ]+B_2[h_2\ \text{upto}\ t_2) +S_{B_1B_2}+S_{B_1}+S_{IB_1}+S_I =K \land y \leq N \land & \\ 
+& \quad h_1 \leq t_1 \land t_1-h_1 \leq N_{B_1} \land h_2 \leq t_2 \land t_2-h_2 \leq N_{B_2}  &\\
+& \triangleright y=h_2 &
+% 5
+\end{flalign*}
+
+\noindent Finally, for \texttt{transfer()}, $t_2=h_1$ is both a precondition and a postcondition:
+\begin{flalign*}
+& \triangleright S_O+S_{B_2O}+S_{B_2}+S_{B_1B_2}+S_{B_1}+S_{IB_1}+S_I=K \land & \\ 
+& \quad h_1 \leq t_1 \land t_1-h_1 \leq N_{B_1} \land h_2 \leq t_2 \land t_2-h_2 \leq N_{B_2}  &\\
+& \triangleright t_2=h_1 &\\
+% 1
+& \textbf{wait until } h_1<t_1\ \textbf{and}\ t_2-h_2<N_{B_2} & \\
+% 
+& \triangleright S_O+S_{B_2O}+B_2[h_2\ \text{upto}\ t_2)+[\ ]+(B_1[h_1\ \text{mod}\ N_{B_1}]+B_1[h_1+1\ \text{upto}\ t_1)) +S_{IB_1}+S_I =K \land & \\ 
+& \quad h_1 < t_1 \land t_1-h_1 \leq N_{B_1} \land h_2 \leq t_2 \land t_2-h_2 < N_{B_2}  &\\
+& \triangleright t_2=h_1 &\\
+% 2
+& \mathbf{B_2}[t_2\ \text{mod}\ N_{B_2}] := B_1[h_1\ \text{mod}\ N_{B_1}] & \\
+%
+& \triangleright S_O+S_{B_2O}+B_2[h_2\ \text{upto}\ t_2)+[\ ]+(B_2[t_2\ \text{mod}\ N_{B_2}]+B_1[h_1+1\ \text{upto}\ t_1)) +S_{IB_1}+S_I =K \land & \\ 
+& \quad h_1 < t_1 \land t_1-h_1 \leq N_{B_1} \land h_2 \leq t_2 \land t_2-h_2 < N_{B_2}  &\\
+& \triangleright t_2=h_1 &\\
+% 3
+& \mathbf{h_1} := h_1 + 1 & \\
+%
+& \triangleright S_O+S_{B_2O}+B_2[h_2\ \text{upto}\ t_2)+B_2[t_2\ \text{mod}\ N_{B_2}]+B_1[h_1\ \text{upto}\ t_1) +S_{IB_1}+S_I =K \land & \\ 
+& \quad h_1 \leq t_1 \land t_1-h_1 \leq N_{B_1} \land h_2 \leq t_2 \land t_2-h_2 < N_{B_2}  &\\
+& \triangleright t_2+1=h_1 &\\
+% 4
+& \mathbf{t_2} := t_2 + 1 & \\
+%
+& \triangleright S_O+S_{B_2O}+B_2[h_2\ \text{upto}\ t_2)+[\ ]+B_1[h_1\ \text{upto}\ t_1) +S_{IB_1}+S_I =K \land & \\ 
+& \quad h_1 \leq t_1 \land t_1-h_1 \leq N_{B_1} \land h_2 \leq t_2 \land t_2-h_2 \leq N_{B_2}  &\\
+& \triangleright t_2=h_1 &
+% 5
+\end{flalign*}
+
+For all three functions, the statements at every point are at least as strong as the invariant, so the local correctness is maintained.
+
+\subsection*{Noninterference Proof}
+The noninterference proof is still easy. All assertions are a conjunction of predicates of 5 forms:
+\begin{itemize}
+    \item $S_O+S_{B_2O}+S_{B_2}+S_{B_1B_2}+S_{B_1}+S_{IB_1}+S_I = K$, which is included in the invariant, and proved to hold everywhere as long as other conjuncts hold.
+    \item $x<N, x \leq N, y < N, y \leq N$, which only involve local variables $x,y$ and the constant $N$, so interference is impossible.
+    \item $t_1=x, t_1+1=x, y=h_2, y+1=h_2, t_2=h_1, t_2+1=h_1$, which involve shared variables $t_1,h_2,t_2,h_1$, but they are only ever updated by the concerned process itself: only \textbf{S} touches $t_1$, only \textbf{R} touches $h_2$, and only \textbf{T} (the process calling \texttt{transfer()}) touches $t_2$ and $h_1$.
+    \item $h_1 \leq t_1, t_1 - h_1 \leq N_{B_1}, h_2 \leq t_2, t_2 - h_2 \leq N_{B_2}$, which are also parts of the invariant, so already covered.
+\end{itemize}
+
+This leaves only $t_1-h_1<N_{B_1}$, $h_2<t_2$, $h_1<t_1$ and $t_2-h_2<N_{B_2}$ as predicates that might suffer interference:
+
+\begin{enumerate}
+    \item $t_1-h_1<N_{B_1}$ only appears in \textbf{S}, and the only statement outside \textbf{S} that might invalidate it is $h_1:=h_1+1$ in \textbf{T}, with the following annotation:
+\begin{flalign*}
+& \triangleright t_1-h_1<N_{B_1} &\\
+% 
+& \mathbf{h_1} := h_1 + 1 & \\
+%
+& \triangleright t_1-h_1<N_{B_1} &
+\end{flalign*}
+\textbf{T} only makes $S_{B_1}$ shorter, so if it was not full, it still is not.
+    
+    \item $h_2<t_2$ only appears in \textbf{R}, and the only statement outside \textbf{R} that might invalidate it is $t_2:=t_2+1$ in \textbf{T}, with the following annotation:
+\begin{flalign*}
+& \triangleright h_2<t_2 &\\
+% 
+& \mathbf{t_2} := t_2 + 1 & \\
+%
+& \triangleright h_2<t_2 &
+\end{flalign*}
+\textbf{T} only makes $S_{B_2}$ longer, so if it was not empty, it still is not.
+
+    \item $h_1<t_1$ only appears in \textbf{T}, and the only statement outside \textbf{T} that might invalidate it is $t_1:=t_1+1$ in \textbf{S}, with the following annotation:
+\begin{flalign*}
+& \triangleright h_1<t_1 &\\
+% 
+& \mathbf{t_1} := t_1 + 1 & \\
+%
+& \triangleright h_1<t_1 &
+\end{flalign*}
+\textbf{S} only makes $S_{B_1}$ longer, so if it was not empty, it still is not.
+
+    \item $t_2-h_2<N_{B_2}$ only appears in \textbf{T}, and the only statement outside \textbf{T} that might invalidate it is $h_2:=h_2+1$ in \textbf{R}, with the following annotation:
+\begin{flalign*}
+& \triangleright t_2-h_2<N_{B_2} &\\
+% 
+& \mathbf{h_2} := h_2 + 1 & \\
+%
+& \triangleright t_2-h_2<N_{B_2} &
+\end{flalign*}
+\textbf{R} only makes $S_{B_2}$ shorter, so if it was not full, it still is not.
+    
+\end{enumerate}
+
+
+% to comment sections out, use the command \ifx and \fi. Use this technique when writing your pre lab. For example, to comment something out I would do:
+%  \ifx
+%	\begin{itemize}
+%		\item item1
+%		\item item2
+%	\end{itemize}	
+%  \fi
+
+\section*{Partial Correctness}
+From initialization $x,y,h_1,t_1,h_2,t_2:=0,0,0,0,0,0$ and the extended invariant, we know that $ [\ ] + [\ ] + [\ ] + [\ ] + [\ ] + [\ ] + I[0,N) = K $, so $ K = I[0,N) $.
+
+The extended invariant plus the termination condition ($y=N$) for \textbf{R} implies that 
+$$ O[0,N) + S_{B_2O}+S_{B_2}+S_{B_1B_2}+S_{B_1}+S_{IB_1}+S_I = K = I[0, N),$$ which implies
+$$ N + |S_{B_2O}| + |S_{B_2}| + |S_{B_1B_2}| + |S_{B_1}| + |S_{IB_1}| + |S_I| = |I[0, N)| = N, $$ therefore
+$$ |S_{B_2O}| = |S_{B_2}| = |S_{B_1B_2}| = |S_{B_1}| = |S_{IB_1}| = |S_I| = 0,$$ thus
+$$ O[0,N) = I[0,N).$$
+\end{document}
